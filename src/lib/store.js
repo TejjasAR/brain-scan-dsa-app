@@ -10,6 +10,7 @@ export const supabaseConfigured = Boolean(url && anon && !url.includes('your-pro
 export const supabase = supabaseConfigured ? createClient(url, anon) : null
 
 const emptyState = () => ({
+  user: null, // local demo auth only in V1: { name, email, authMethod, createdAt }
   scanAttempts: [], scanDone: false, scanProfile: null, brainType: null, startingLevel: 3,
   target: '', learningStyle: '',
   completedChunkIds: [], mastery: {}, level: 1, xp: 0, streak: 0, lastVisitDate: '',

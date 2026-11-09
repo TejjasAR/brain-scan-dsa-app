@@ -1,26 +1,35 @@
-# Brain-Scan DSA — V1 MVP
+# SochCode — V1 MVP
 
-**Students don't quit DSA — they quit because they can't think, yet.**
+**Soch pehle, code baad mein. / Think first, then code.**
 
-A web-first, text-only learning app. Brain Scan (50 questions) → Brain Type → Personalized Roadmap → Thinking Workouts → DSA chunks, chunk by chunk. DSA only in V1.
+Minimal, text-only learning app. Students quit DSA because they cannot think — SochCode teaches how to think first, then DSA gets a grip. DSA only in V1.
+
+## Flow (minimal, by design)
+
+1. **Landing = login / signup only.** Nothing else. No hero, no cards, no Free vs Pro.
+   Local demo auth in V1: email + password, Continue with Google (placeholder, asks name/email, continues locally — no real Google OAuth yet), or Continue as guest (first name only). No password is stored.
+2. **After login → 50-question Brain Scan, straight away.** 3 rounds (15+15+20), one at a time, MCQ + typed, timer recorded.
+3. **After scan → Brain Type result → "See your roadmap".** Only then do Roadmap / Think / Learn / Re-scan / Dashboard appear, in a minimal top nav.
+
+Everything else stays behind the scan: adaptive engine, 10 Thinking Workouts, 18 DSA chunks (3 per topic: Arrays, Strings, Two Pointers, Hashing, Stack/Queue, Linked List basics), Weekly Re-scan (10 Qs).
 
 ## How to run (free)
 
 ```bash
 npm install --no-audit --no-fund
 npm run dev     # open http://localhost:5173
-npm run build   # creates dist/ for Cloudflare Pages
+npm run build   # creates dist/ for Cloudflare Pages / GitHub Pages
 npm run preview # preview the production build
 ```
 
-No account, no keys, no payment needed to run it. Without Supabase keys it works fully in `localStorage` under key `brainscan-v1`.
+No account, no keys, no payment needed to run it. Without Supabase keys it works fully in `localStorage` under key `brainscan-v1` (user + progress).
 
 ## Tech stack (₹0)
 
-- **Frontend:** React + Vite + Tailwind CSS v3 (SPA, no SSR)
-- **Hosting:** Cloudflare Pages — connect the repo, build command `npm run build`, output `dist/`. Free tier: unlimited bandwidth, 500 builds/mo, no card.
-- **Backend / DB / Auth:** Supabase Free, ready but optional. See `supabase/schema.sql`.
-- **Content:** Markdown/JSON-style data in `src/data/` — no CMS.
+- **Frontend:** React + Vite + Tailwind CSS v3 (SPA, no SSR), Vite base `./`
+- **Hosting:** Cloudflare Pages — connect the repo, build command `npm run build`, output `dist/`. Also deploys to GitHub Pages from `dist/` on the `gh-pages` branch.
+- **Backend / DB / Auth:** Supabase Free, ready but optional. See `supabase/schema.sql`. V1 login is local only.
+- **Content:** Data in `src/data/` — no CMS, no videos.
 - **AI:** Light, rule-based adaptive engine in `src/lib/adaptive.js`. No LLM, no API keys, no live C++ execution in V1. MCQ + trace + typed logic answers checked in the browser.
 
 ## Supabase setup (optional, placeholders only)
@@ -32,32 +41,30 @@ No account, no keys, no payment needed to run it. Without Supabase keys it works
 
 Never commit a real `.env` — it is in `.gitignore`.
 
-## What is in V1
-
-- Home / landing, Brain Scan (50 Qs, 3 rounds 15+15+20), Brain Type result (5 types), Personalized Roadmap (Foundation → Thinking → Mastery), Thinking Workouts (10), DSA Learn (18 chunks, 3 per topic: Arrays, Strings, Two Pointers, Hashing, Stack/Queue, Linked List basics), Weekly Re-scan (10 Qs), Dashboard (streak, XP, level, mastery).
-- Adaptive engine: `scoreScan()` → profile + brain type + starting level, `generateRoadmap()`, `updateMastery()` (Elo-like, +12 fast-correct / +8 correct / +5 slow-correct / -4 slow-wrong / -7 fast-wrong), `nextChunk()`. Pure functions, deterministic, no React in that file.
-
 ## What is NOT in V1
 
 - No video lectures (text only, by design)
 - No live C++ code execution (Piston public API closed Feb 2026; JDoodle free is 20 runs/day — too small)
-- No payments / ads. Free vs Pro ₹99/mo is shown as a placeholder only. Razorpay later: 2% + GST, no setup fee.
+- No payments / ads
 - No other subjects (SQL, DBMS, OS, CN come later)
 - No real user accounts until Supabase Auth is wired in V2
 
 ## File structure
 
 ```
-src/App.jsx               # state routing + all pages (Home, Scan, Result, Roadmap, Workouts, Learn, Re-scan, Dashboard)
+src/App.jsx               # minimal gating: Auth only -> Scan only -> Result + nav
 src/main.jsx
-src/index.css
+src/index.css             # white, minimal
+src/components/Auth.jsx  # login / signup / Google placeholder / guest (local only)
+src/components/Scan.jsx  # 50-Q flow, round breaks, per-question timing
+src/components/ChunkPlayer.jsx # MCQ / typed player with instant explanation
 src/lib/adaptive.js       # light AI — pure functions
-src/lib/store.js          # localStorage + Supabase wrapper (falls back to local)
+src/lib/store.js          # localStorage (brainscan-v1, incl. user) + Supabase wrapper
 src/data/scanQuestions.js # 50 scan Qs + 10 re-scan Qs
 src/data/thinkingWorkouts.js # 10 workouts
 src/data/dsaChunks.js     # 18 DSA chunks
-src/components/ChunkPlayer.jsx # MCQ / typed player with instant explanation
-src/components/Scan.jsx  # 50-Q flow, round breaks, per-question timing
 supabase/schema.sql
 .env.example
 ```
+
+Repo name on GitHub stays `brain-scan-dsa-app` for now. App name is SochCode.
